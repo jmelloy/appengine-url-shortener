@@ -1,7 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<form role="form" method="post">
+  <div class="form-group">
+    <label class="control-label" for="url">URL</label>
+    <input class="form-control" id="url"
+    placeholder="URL" type="url">
+  </div>
+  <div class="form-group">
+    <label class="control-label" for="custom_url">Name</label>
+    <input class="form-control" id="custom_url"
+    placeholder="Name ..." type="input">
+  </div>
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>
    <!-- TODO: put <input> here -->
    <!-- TODO: put 'load stats button here' -->
 

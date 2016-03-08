@@ -1,6 +1,6 @@
-{{ l.url }}<br>
+{% extends "base.html" %}
 
-{{ l.custom_path }}<br/>
+{% block content %}
+<h1>http://g.town/{{ l.custom_path }}</h1>
 
-
-{{ l.count }}
+{% endblock %}

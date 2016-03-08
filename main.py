@@ -6,6 +6,7 @@ import jinja2
 
 from models import *
 import base62
+import datetime
 
 template_path = os.path.join(os.path.dirname(__file__), "templates")
 
@@ -56,8 +57,7 @@ class Stats(BasePage):
 
         l = Link.get_by_id(code)
 
-        self.template_values.update({"links":links})
-        self.render("stats.html", self.template_values)
+        self.render("stats.html", {"l": l})
 
 class Expand(BasePage):
     """
@@ -69,12 +69,18 @@ class Expand(BasePage):
         #account for 404, log it.
         linkobj.count += 1
         linkobj.put()
+
+        le = LinkExpand(code = path,
+                        timestamp=datetime.datetime.now(),
+                        ip_address=self.request.remote_addr,
+                        header = [Header(Key=k, Value=v) for k,v in self.request.headers.items()]
+                        )
+        le.put()
+
         self.redirect(str(linkobj.url))
-
-
 
 app = webapp2.WSGIApplication([
     ("/", Index),
-    ("/(.+)", Expand),
     ("/(.+)/stats", Stats),
+    ("/(.+)", Expand),
     ], debug=True)

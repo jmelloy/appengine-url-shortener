@@ -1,27 +1,52 @@
 <html>
-<head>
-  <title>{% block title %}{% endblock %}</title>
-  <meta name="description" content="">
-  <!--[if lt IE 8]><link rel="stylesheet" href="/static/css/ie.css" type="text/css"><![endif]-->
-  <link type='text/css' href="/static/css/base.css" media="all" rel="stylesheet" />
-  <link type='text/css' href="/static/css/main.css" media="all" rel="stylesheet" />
-  <script type='text/javascript' src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-  <script type='text/javascript' src="/static/js/main.js"></script>
-  {% block extrahead %}{% endblock %}
-</head>
-<body>
 
-<div class="container">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css"
+    rel="stylesheet" type="text/css">
+    <link href="http://pingendo.github.io/pingendo-bootstrap/themes/default/bootstrap.css"
+    rel="stylesheet" type="text/css">
+      <style>
+          body {
+              background-image: url("/static/img/2225018212_45e747fcfd_o.jpg");
+              background-size: 100%;
+          }
+      </style>
+  </head>
 
-    <form method="post">
-        <input name="url">
-        <input name="custom_path">
-        <input type="submit">
-    </form>
+  <body>
+    <div class="section" style="height: 85%">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+              {% block content %}{% endblock %}
 
-</div><!-- end "container" -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="section">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <p class="text-info text-right">
+              <br>
+              <br>
+            </p>
 
-{% block extrafoot %}{% endblock %}
+            <div class="row">
+              <div class="col-md-12 hidden-xs text-right text-inverse">
+                <i><a href="https://www.flickr.com/photos/pong/2225018212/" style="color: #fff;">Photo by Rob Pongsajapan</a></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
 
-</body>
 </html>

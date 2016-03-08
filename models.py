@@ -8,6 +8,9 @@ class Link(ndb.Model):
     count = ndb.IntegerProperty(default=0)
     created = ndb.DateTimeProperty(auto_now_add=True)
 
+class Header(ndb.Model):
+    Key = ndb.StringProperty()
+    Value = ndb.StringProperty()
 
 class Counter(ndb.Model):
     count = ndb.IntegerProperty()
@@ -23,3 +26,10 @@ class Counter(ndb.Model):
         counter.put()
 
         return counter.count
+
+
+class LinkExpand(ndb.Model):
+    code = ndb.StringProperty()
+    ip_address = ndb.StringProperty()
+    header = ndb.StructuredProperty(Header, repeated=True)
+    timestamp = ndb.DateTimeProperty()
