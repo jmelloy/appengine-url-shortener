@@ -10,18 +10,14 @@
   {% block extrahead %}{% endblock %}
 </head>
 <body>
- 
+
 <div class="container">
 
-   {% if user %}
-     <div class="userbar">Welcome, <b>{{ user }}!</b> | <a href="{{ logout_url }}">Logout</a></div>
-   {% else %}
-     <div class="userbar">Welcome! <a href="{{ login_url }}">Sign In</a></div>
-   {% endif %}
-
-  {% block content %}
-  {% endblock %}
-
+    <form method="post">
+        <input name="url">
+        <input name="custom_path">
+        <input type="submit">
+    </form>
 
 </div><!-- end "container" -->
 

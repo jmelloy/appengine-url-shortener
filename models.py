@@ -1,13 +1,25 @@
-import logging
+from google.appengine.ext import ndb
+import random
 
-from google.appengine.ext import db
-from google.appengine.ext import blobstore
-from google.appengine.api import memcache
+class Link(ndb.Model):
+    user = ndb.UserProperty()
+    url = ndb.StringProperty()
+    custom_path = ndb.StringProperty()
+    count = ndb.IntegerProperty(default=0)
+    created = ndb.DateTimeProperty(auto_now_add=True)
 
 
-class Link(db.Model):
-    user = db.UserProperty()
-    url = db.LinkProperty()
-    custom_path = db.BooleanProperty(default=False)
-    count = db.IntegerProperty(default=0)
-    created = db.DateTimeProperty(auto_now_add=True)
+class Counter(ndb.Model):
+    count = ndb.IntegerProperty()
+
+    @staticmethod
+    @ndb.transactional()
+    def increment(shard='counter'):
+        """Increment the value for a given sharded counter."""
+        counter = Counter.get_by_id(shard)
+        if counter is None:
+            counter = Counter(id=shard, count=0)
+        counter.count += 1
+        counter.put()
+
+        return counter.count

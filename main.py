@@ -1,41 +1,26 @@
 import os
 import logging
 
-from google.appengine.ext import webapp 
-from google.appengine.ext.webapp import template
-from google.appengine.ext.webapp.util import run_wsgi_app
-from google.appengine.api import users
-from google.appengine.ext import db
+import webapp2
+import jinja2
 
-from models import Link
+from models import *
+import base62
+
+template_path = os.path.join(os.path.dirname(__file__), "templates")
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(template_path),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 
-class BasePage(webapp.RequestHandler):
-
-    def __init__(self):
-        (self.user, self.login_url, self.logout_url) = self.auth_data()
-        self.user_is_admin = users.is_current_user_admin()
-        self.template_values = {
-            "user":self.user, 
-            "user_is_admin":self.user_is_admin,
-            "login_url":self.login_url, 
-            "logout_url":self.logout_url,
-            "debug":config.SITE["debug"],
-        } 
-
-    def auth_data(self):
-        """Returns: (user, login_url, logout_url)"""
-        user = users.get_current_user()
-        login_url = users.create_login_url("/auth")
-        logout_url = users.create_logout_url("/")
-        return (user, login_url, logout_url)
-
-    def template_path(self, tmpl):
-        return os.path.join(os.path.dirname(__file__), "templates/%s" % tmpl)
-
-    def render(self, tmpl, tmpl_vals):
-        template_path = self.template_path(tmpl) 
-        self.response.out.write(template.render(template_path, tmpl_vals))
+class BasePage(webapp2.RequestHandler):
+    def render(self, template, values=None):
+        if not values:
+            values = {}
+        template = JINJA_ENVIRONMENT.get_template(template)
+        self.response.out.write(template.render(values))
 
 
 class Index(BasePage):
@@ -44,26 +29,35 @@ class Index(BasePage):
     """
 
     def get(self):
-        self.template_values.update({})
-        self.render("index.html", self.template_values) 
+        self.render("index.html", {})
 
     def post(self):
         url = self.request.get("url")
         custom_path = self.request.get("custom_path")
         if custom_path:
-            exists = Link.filter("path =", custom_path).get()
+            exists = Link.get_by_id(custom_path)
             if exists:
                 return "path already exists, choose another"
-        
+        else:
+            id = Counter.increment()
+            custom_path = base62.base62_encode(id)
+
+        l = Link(url=url, custom_path=custom_path, id = custom_path)
+        l.put()
+
+        self.redirect("/" + custom_path + "/stats")
+
 class Stats(BasePage):
     """
     Show stats for most recent and most followed links.
     """
 
-    def get(self):
-        links = Link.filter("user =", self.user).order_by_count_desc().fetch(config.SITE["max_stats"])
+    def get(self, code):
+
+        l = Link.get_by_id(code)
+
         self.template_values.update({"links":links})
-        self.render("stats.html", self.template_values) 
+        self.render("stats.html", self.template_values)
 
 class Expand(BasePage):
     """
@@ -71,18 +65,16 @@ class Expand(BasePage):
     """
 
     def get(self, path):
-        linkobj = Link.get_link_by_path(path)
+        linkobj = Link.get_by_id(path)
         #account for 404, log it.
         linkobj.count += 1
         linkobj.put()
-        self.redirect(linkobj.url)
+        self.redirect(str(linkobj.url))
 
 
-application = webapp.WSGIApplication([
+
+app = webapp2.WSGIApplication([
     ("/", Index),
-    ("/stats", Stats),
     ("/(.+)", Expand),
+    ("/(.+)/stats", Stats),
     ], debug=True)
-
-if __name__ == "__main__":
-    run_wsgi_app(application)
